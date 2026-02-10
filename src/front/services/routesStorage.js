@@ -1,6 +1,31 @@
 import { session } from "./session";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
+const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;
+
+const getRouteCoords = (route) =>
+  route?.preview_coords ||
+  route?.coords ||
+  route?.coordinates ||
+  route?.geojson?.geometry?.coordinates ||
+  route?.geojsonFeature?.geometry?.coordinates ||
+  route?.geojsonLine?.geometry?.coordinates ||
+  null;
+
+const sanitizeCoords = (coords) => {
+  if (!Array.isArray(coords)) return [];
+
+  return coords
+    .filter((point) => Array.isArray(point) && point.length >= 2)
+    .map((point) => [Number(point[0]), Number(point[1])])
+    .filter(([lng, lat]) => Number.isFinite(lng) && Number.isFinite(lat));
+};
+
+const sampleCoords = (coords, maxPoints = 120) => {
+  if (coords.length <= maxPoints) return coords;
+  const step = Math.ceil(coords.length / maxPoints);
+  return coords.filter((_, index) => index % step === 0 || index === coords.length - 1);
+};
 
 const normalizeRoute = (route) => {
   if (!route || typeof route !== "object") return null;
@@ -14,14 +39,7 @@ const normalizeRoute = (route) => {
     route.date ||
     new Date().toISOString();
 
-  const coords =
-    route.preview_coords ||
-    route.coords ||
-    route.coordinates ||
-    route.geojson?.geometry?.coordinates ||
-    route.geojsonFeature?.geometry?.coordinates ||
-    route.geojsonLine?.geometry?.coordinates ||
-    null;
+  const coords = getRouteCoords(route);
 
   return {
     id,
@@ -53,18 +71,38 @@ const apiFetch = async (path, options = {}) => {
     headers,
   });
 
-  let data = null;
-  try {
-    data = await resp.json();
-  } catch {
-    data = null;
-  }
+  const data = await resp.json().catch(() => null);
 
   if (!resp.ok) {
     throw new Error(data?.msg || `HTTP ${resp.status}`);
   }
 
   return data;
+};
+
+export const getRoutePreviewImage = (route, size = { width: 640, height: 320 }) => {
+  if (!mapboxToken) return null;
+
+  const width = Number(size?.width) || 640;
+  const height = Number(size?.height) || 320;
+  const coords = sampleCoords(sanitizeCoords(getRouteCoords(route)));
+  if (coords.length < 2) return null;
+
+  const feature = {
+    type: "Feature",
+    properties: {
+      stroke: "#3b82f6",
+      "stroke-width": 5,
+      "stroke-opacity": 0.9,
+    },
+    geometry: {
+      type: "LineString",
+      coordinates: coords,
+    },
+  };
+
+  const overlay = `geojson(${encodeURIComponent(JSON.stringify(feature))})`;
+  return `https://api.mapbox.com/styles/v1/mapbox/outdoors-v12/static/${overlay}/auto/${width}x${height}?padding=24,24,24,24&access_token=${mapboxToken}`;
 };
 
 export const getRoutes = async () => {
