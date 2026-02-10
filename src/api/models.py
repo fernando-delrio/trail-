@@ -1,8 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import String, Boolean
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
-from typing import List, Dict, Any, Optional
+from typing import Dict, Any
 
 
 db = SQLAlchemy()
@@ -79,8 +78,8 @@ class Bike(db.Model):
     is_active = db.Column(db.Boolean, default=False)
     
     # Relaciones
-    parts: Mapped[List["BikePart"]] = relationship("BikePart", backref="bike", cascade="all, delete-orphan")
-    bike_model: Mapped[Optional["BikeModel"]] = relationship("BikeModel", backref="bikes")  # NUEVA
+    parts = relationship("BikePart", backref="bike", cascade="all, delete-orphan")
+    bike_model = relationship("BikeModel", backref="bikes")  # NUEVA
     
     def serialize(self) -> Dict[str, Any]:
         return {
