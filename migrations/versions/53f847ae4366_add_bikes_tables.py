@@ -45,8 +45,8 @@ def upgrade():
     sa.ForeignKeyConstraint(['bike_id'], ['bikes.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.drop_table('bike')
     op.drop_table('bike_part')
+    op.drop_table('bike')
     # ### end Alembic commands ###
 
 
