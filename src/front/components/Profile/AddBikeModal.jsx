@@ -36,8 +36,8 @@ const AddBikeModal = ({
     const [loading, setLoading] = useState(false);
 
     const imageWidgetConfig = {
-        cloudName: "ddx9lg1wd",
-        uploadPreset: "upload_preset",
+        cloudName: import.meta.env.VITE_CLOUDINARY_CLOUD_NAME,
+        uploadPreset: import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
         sources: [
             "local",
             "camera",

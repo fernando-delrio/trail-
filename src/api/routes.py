@@ -9,6 +9,10 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from api.services.mistral_client import mistral_chat
 from api.services.catalog import load_catalog, rank_bikes
 from api.services.overpass_pois import get_nearby_services_for_route
+from api.services.osm_trails import (
+    is_route_intent, extract_location, geocode_place,
+    fetch_osm_trails, build_trails_system_message,
+)
 from datetime import datetime, timezone
 from uuid import uuid4
 
@@ -504,7 +508,7 @@ def _is_bike_intent(messages):
 
 
 @api.route("/ai/chat", methods=["POST"])
-# @jwt_required()
+@jwt_required()
 def ai_chat():
     try:
         import re
@@ -542,6 +546,9 @@ def ai_chat():
                 "Avisa de piezas >= 80% (urgente) o >= 60% (vigilar pronto). Sé específico: pieza, porcentaje, acción.\n"
                 "- Si hay una RUTA ANALIZADA: evalúa qué bici del PERFIL DEL USUARIO es más adecuada según terreno, distancia y desnivel. "
                 "Sé directo: nombra la bici, explica por qué encaja y advierte si alguna pieza está muy desgastada para esa ruta.\n"
+                "- Si el usuario pide recomendaciones de rutas por una zona: usa los datos de RUTAS EN OPENSTREETMAP si están disponibles. "
+                "Lista cada ruta con nombre, distancia y dificultad. Si no hay datos OSM, usa tu conocimiento de rutas populares en esa zona. "
+                "Siempre recomienda también qué tipo de bici conviene para el terreno pedido.\n"
                 "- Al final añade 1 o 2 preguntas de seguimiento en este formato EXACTO (sin emojis en opciones):\n"
                 "[Q1] ¿pregunta? | Opción A | Opción B | Opción C\n"
                 "[Q2] ¿pregunta? | Opción A | Opción B\n"
@@ -601,8 +608,11 @@ def ai_chat():
             and m.get("content") not in _SKIP
         ]
 
+        # --- Contexto de ruta analizada ---
+        extra_sys_messages = []
+
         if route_context.get("name") or route_context.get("terrain"):
-            route_sys = {
+            extra_sys_messages.append({
                 "role": "system",
                 "content": (
                     "RUTA ANALIZADA:\n"
@@ -613,10 +623,25 @@ def ai_chat():
                     f"- Desnivel: +{round(float(route_context.get('gain_m') or 0))} m\n"
                     "Evalúa qué bici del PERFIL DEL USUARIO es más adecuada para esta ruta."
                 ),
-            }
-            prompt = [system, catalog_context, profile_context, route_sys] + clean_history
-        else:
-            prompt = [system, catalog_context, profile_context] + clean_history
+            })
+
+        # --- Recomendación de rutas OSM ---
+        last_user_msg = next(
+            (m["content"] for m in reversed(clean_history) if m.get("role") == "user"),
+            "",
+        )
+        if is_route_intent(last_user_msg):
+            location_name = extract_location(last_user_msg)
+            if location_name:
+                terrain_hint = route_context.get("terrain") or body.get("terrain") or "mtb"
+                geo = geocode_place(location_name)
+                if geo:
+                    trails = fetch_osm_trails(geo["lat"], geo["lon"], terrain_hint)
+                    extra_sys_messages.append(
+                        build_trails_system_message(geo["display"], trails)
+                    )
+
+        prompt = [system, catalog_context, profile_context] + extra_sys_messages + clean_history
 
         # 3) Llamar a Mistral
         result = mistral_chat(prompt, temperature=0.4)

@@ -4,14 +4,12 @@ import { session } from "../services/session";
 
 
 
-const DEFAULT_BACKEND = "http://127.0.0.1:3001";
-
 
 const DEFAULT_MESSAGES = [
   {
     role: "assistant",
     content:
-      "👋 Soy GASTACOBRE. Dime qué tipo de bici buscas (carretera, gravel, XC, enduro, DH) y tu presupuesto aprox.",
+      "👋 Soy GASTACOBRE. Puedo ayudarte a elegir tu próxima bici o recomendarte rutas por zona y terreno (gravel, XC, trail, enduro, downhill, carretera). ¿Qué necesitas?",
   },
 ];
 
@@ -204,7 +202,7 @@ export default function AiChatDialog({ floating = true, routeContext = null }) {
 
   const { user } = useUser();
 
-  const backendUrl = (import.meta?.env?.VITE_BACKEND_URL || DEFAULT_BACKEND).replace(/\/$/, "");
+  const backendUrl = (import.meta.env.VITE_BACKEND_URL || "").replace(/\/$/, "");
 
   useEffect(() => {
     const token = session.getToken();
@@ -264,12 +262,16 @@ export default function AiChatDialog({ floating = true, routeContext = null }) {
     try {
       const resp = await fetch(`${backendUrl}/api/ai/chat`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.getToken()}`,
+        },
         body: JSON.stringify({
           messages: nextMessages,
           context: updatedContext,
           user_profile: buildUserProfile(),
           route_context: routeContext || undefined,
+          terrain: routeContext?.terrain || undefined,
         }),
       });
 
@@ -335,8 +337,11 @@ export default function AiChatDialog({ floating = true, routeContext = null }) {
     try {
       const resp = await fetch(`${backendUrl}/api/ai/chat`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: nextMessages, context: updatedContext, user_profile: buildUserProfile(), route_context: routeContext || undefined }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.getToken()}`,
+        },
+        body: JSON.stringify({ messages: nextMessages, context: updatedContext, user_profile: buildUserProfile(), route_context: routeContext || undefined, terrain: routeContext?.terrain || undefined }),
       });
       const data = await resp.json().catch(() => ({}));
       if (!resp.ok) {
