@@ -1,3 +1,7 @@
+.app-root:has(.rr-page) {
+  padding-top: 0 !important;
+}
+
 .rr-page {
   position: relative;
   height: 100vh;
@@ -89,7 +93,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 150px;
+  bottom: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -112,6 +116,12 @@
 }
 
 .rr-card-sub {
+  margin-top: 4px;
+  opacity: 0.7;
+  font-size: 13px;
+}
+
+.rr-card-subtitle {
   margin-top: 4px;
   opacity: 0.7;
   font-size: 13px;
@@ -226,7 +236,7 @@
 
 .mapboxgl-ctrl-bottom-right,
 .mapboxgl-ctrl-bottom-left {
-  bottom: 120px !important;
+  bottom: 20px !important;
 }
 
 /* Botones compactos solo en RouteRegistration */
@@ -257,6 +267,30 @@
   margin: 8px 0 12px;
 }
 
+.rr-back-btn {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 20;
+  border: 0;
+  cursor: pointer;
+  background: #020617;
+  color: #f3c247;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 8px 14px;
+  border-radius: 999px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+@media (max-width: 560px) {
+  .rr-back-btn {
+    top: auto;
+    bottom: 14px;
+    left: 14px;
+  }
+}
+
 .rr-toast {
   margin-bottom: 10px;
   background: #16a34a;
@@ -267,4 +301,170 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
   text-align: center;
   z-index: 20;
+}
+
+/* ================================
+   DISEÑO DEPORTIVO — card interior
+================================= */
+
+/* Ocultar el FAB flotante de GASTACOBRE en páginas de mapa
+   (el diálogo sigue abriendo via el botón ANALIZAR) */
+.rr-page .gc-fab {
+  display: none;
+}
+
+.rr-card {
+  pointer-events: auto;
+  width: min(480px, calc(100% - 24px));
+  background: #020617;
+  border-radius: 16px;
+  padding: 12px 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  color: #ffffff;
+}
+
+.rr-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.rr-card-title {
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+}
+
+.rr-card-badge {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  opacity: 0.5;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Métricas grandes (estilo deportivo) */
+.rr-metrics-sport {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.rr-metric-box {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 8px 12px 10px;
+}
+
+.rr-metric-box-label {
+  font-size: 8px;
+  font-weight: 800;
+  opacity: 0.45;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+.rr-metric-box-val {
+  font-size: 26px;
+  font-weight: 900;
+  color: #f3c247;
+  line-height: 1;
+  margin-top: 3px;
+}
+
+.rr-metric-box-unit {
+  font-size: 10px;
+  font-weight: 700;
+  opacity: 0.5;
+  margin-top: 1px;
+}
+
+/* Fila secundaria de métricas pequeñas */
+.rr-metrics-secondary {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.rr-metric-mini {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.rr-metric-mini-label {
+  font-size: 8px;
+  font-weight: 800;
+  opacity: 0.45;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.rr-metric-mini-val {
+  font-size: 13px;
+  font-weight: 900;
+  color: #fff;
+}
+
+/* Botones reorganizados */
+.rr-actions-sport {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rr-actions-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.rr-actions-row .ui-btn {
+  flex: 1;
+  padding: 7px 4px;
+  font-size: 10px;
+  min-height: auto;
+  border-radius: 9px;
+}
+
+.rr-btn-full {
+  width: 100%;
+  padding: 10px !important;
+  font-size: 12px !important;
+  border-radius: 10px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.5px;
+}
+
+/* Botón GPS grande */
+.rr-record-btn-sport {
+  width: 100%;
+  border: 0;
+  cursor: pointer;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.rr-record-btn-sport--start {
+  background: #f3c247;
+  color: #111;
+}
+
+.rr-record-btn-sport--stop {
+  background: #e53e3e;
+  color: #fff;
 }

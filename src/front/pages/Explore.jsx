@@ -239,6 +239,14 @@ export default function Explore() {
         }}
       />
 
+      <button
+        className="rr-back-btn"
+        onClick={() => navigate("/home")}
+        aria-label="Volver al inicio"
+      >
+        ← Home
+      </button>
+
       <div className="rr-overlay-top">
         <RouteRegistrationHeader
           searchValue={searchValue}
@@ -253,14 +261,41 @@ export default function Explore() {
         {savedMsg && <div className="rr-toast">✅ {savedMsg}</div>}
 
         <div className="rr-card">
-          <div className="rr-card-title">{routeName}</div>
-          <div className="rr-card-subtitle">
-            Terreno: {activeFilter.toUpperCase()} ·{" "}
-            {hasStarted && !canSave ? "Haz clic en el mapa para añadir puntos" : canSave ? "Ruta lista" : "Listo"}
+
+          <div className="rr-card-head">
+            <div className="rr-card-title">{routeName}</div>
+            <div className="rr-card-badge">
+              {activeFilter.toUpperCase()} ·{" "}
+              {hasStarted && !canSave ? "Añade puntos en el mapa" : canSave ? "Ruta lista" : "Listo"}
+            </div>
           </div>
 
-          <div className="rr-card-metrics">
-            <div className="rr-actions">
+          <div className="rr-metrics-sport">
+            <div className="rr-metric-box">
+              <div className="rr-metric-box-label">Distancia</div>
+              <div className="rr-metric-box-val">{distKm.toFixed(2)}</div>
+              <div className="rr-metric-box-unit">km</div>
+            </div>
+            <div className="rr-metric-box">
+              <div className="rr-metric-box-label">Tiempo</div>
+              <div className="rr-metric-box-val">{durMin.toFixed(0)}</div>
+              <div className="rr-metric-box-unit">min</div>
+            </div>
+          </div>
+
+          <div className="rr-metrics-secondary">
+            <div className="rr-metric-mini">
+              <span className="rr-metric-mini-label">Desnivel</span>
+              <span className="rr-metric-mini-val">—</span>
+            </div>
+            <div className="rr-metric-mini">
+              <span className="rr-metric-mini-label">Puntos</span>
+              <span className="rr-metric-mini-val">{waypoints?.length ?? 0}</span>
+            </div>
+          </div>
+
+          <div className="rr-actions-sport">
+            <div className="rr-actions-row">
               <button
                 className="ui-btn ui-btn--secondary"
                 disabled={hasStarted}
@@ -272,27 +307,26 @@ export default function Explore() {
               >
                 INICIAR
               </button>
-
               <button
                 className="ui-btn ui-btn--secondary"
                 onClick={() => navigate("/route-registration")}
               >
                 ▶ GRABAR
               </button>
-
               <button
                 className="ui-btn ui-btn--secondary"
                 onClick={() => {
                   setServicesOpen(false);
                   setServices(null);
-                  if (mapRef.current)
-                    removeNearbyServicesLayers(mapRef.current);
+                  if (mapRef.current) removeNearbyServicesLayers(mapRef.current);
                   clear();
                 }}
               >
                 LIMPIAR
               </button>
+            </div>
 
+            <div className="rr-actions-row">
               <button
                 className="ui-btn ui-btn--secondary"
                 onClick={toggleServices}
@@ -300,7 +334,6 @@ export default function Explore() {
               >
                 SERVICIOS
               </button>
-
               <button
                 className="ui-btn ui-btn--secondary"
                 onClick={savePlannedRoute}
@@ -308,41 +341,31 @@ export default function Explore() {
               >
                 GUARDAR
               </button>
-
-              <button
-                className="ui-btn ui-btn--primary"
-                disabled={!canSave}
-                onClick={() =>
-                  setAnalyzeRoute({
-                    name: routeName,
-                    type: "planned",
-                    terrain: activeFilter,
-                    distance_km: summary?.distanceKm ?? 0,
-                    duration_min: summary?.durationMin ?? null,
-                    gain_m: null,
-                  })
-                }
-              >
-                ANALIZAR
-              </button>
+              <span className="rr-link" onClick={() => navigate("/saved-routes")}>
+                RUTAS →
+              </span>
             </div>
 
-            <div className="rr-m-label">DIST.</div>
-            <div className="rr-m-label">DESNIVEL</div>
-            <div className="rr-m-label">TIEMPO</div>
-            <div className="rr-m-label">RUTAS</div>
-
-            <div className="rr-m-val">{distKm.toFixed(2)} km</div>
-            <div className="rr-m-val">—</div>
-            <div className="rr-m-val">{durMin.toFixed(0)} min</div>
-
-            <span className="rr-link" onClick={() => navigate("/saved-routes")}>
-              RUTAS
-            </span>
+            <button
+              className="ui-btn ui-btn--primary rr-btn-full"
+              disabled={!canSave}
+              onClick={() =>
+                setAnalyzeRoute({
+                  name: routeName,
+                  type: "planned",
+                  terrain: activeFilter,
+                  distance_km: summary?.distanceKm ?? 0,
+                  duration_min: summary?.durationMin ?? null,
+                  gain_m: null,
+                })
+              }
+            >
+              🤖 ANALIZAR CON GASTACOBRE
+            </button>
           </div>
 
           {planError && (
-            <div className="rr-error">
+            <div className="rr-error" style={{ marginTop: 8 }}>
               Plan: {String(planError.message ?? planError)}
             </div>
           )}

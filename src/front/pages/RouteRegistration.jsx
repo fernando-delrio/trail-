@@ -86,6 +86,14 @@ export default function RouteRegistration() {
         }}
       />
 
+      <button
+        className="rr-back-btn"
+        onClick={() => navigate("/home")}
+        aria-label="Volver al inicio"
+      >
+        ← Home
+      </button>
+
       <div className="rr-overlay-top">
         <RouteRegistrationHeader
           searchValue={searchValue}
@@ -99,54 +107,60 @@ export default function RouteRegistration() {
 
       <div className="rr-overlay-cards">
         <div className="rr-card">
-          <div className="rr-card-title">{routeName.toUpperCase()}</div>
-          <div className="rr-card-sub">
-            Terreno: <b>{activeFilter.toUpperCase()}</b>{" "}
-            {isRecording ? "· Grabando…" : "· Listo"}
+
+          <div className="rr-card-head">
+            <div className="rr-card-title">{routeName.toUpperCase()}</div>
+            <div className="rr-card-badge">
+              {activeFilter.toUpperCase()} · {isRecording ? "Grabando…" : "Listo"}
+            </div>
           </div>
 
+          <div className="rr-metrics-sport">
+            <div className="rr-metric-box">
+              <div className="rr-metric-box-label">Distancia</div>
+              <div className="rr-metric-box-val">{metrics.distanceKm.toFixed(2)}</div>
+              <div className="rr-metric-box-unit">km</div>
+            </div>
+            <div className="rr-metric-box">
+              <div className="rr-metric-box-label">Desnivel</div>
+              <div className="rr-metric-box-val">{metrics.gainM}</div>
+              <div className="rr-metric-box-unit">m</div>
+            </div>
+          </div>
 
-          <div className="rr-actions">
-            <button
-              className={`ui-btn ${isRecording ? "ui-btn--danger" : "ui-btn--primary"}`}
-              onClick={toggle}
-            >
-              {isRecording ? "■ DETENER" : "▶ INICIAR"}
-            </button>
+          <div className="rr-metrics-secondary">
+            <div className="rr-metric-mini">
+              <span className="rr-metric-mini-label">Puntos GPS</span>
+              <span className="rr-metric-mini-val">{points.length}</span>
+            </div>
+            <div className="rr-metric-mini">
+              <span className="rr-metric-mini-label">Tiempo</span>
+              <span className="rr-metric-mini-val">—</span>
+            </div>
+          </div>
 
+          <button
+            className={`rr-record-btn-sport ${isRecording ? "rr-record-btn-sport--stop" : "rr-record-btn-sport--start"}`}
+            onClick={toggle}
+          >
+            {isRecording ? "■ Detener grabación" : "▶ Iniciar grabación"}
+          </button>
+
+          <div className="rr-actions-row">
             <button
               className="ui-btn ui-btn--secondary"
+              style={{ flex: 1, padding: "8px 6px", fontSize: 11, minHeight: "auto", borderRadius: 10 }}
               onClick={() => navigate("/explore")}
             >
-              Planificar
+              Planificar ruta
             </button>
-
             <span className="rr-link" onClick={() => navigate("/saved-routes")}>
-              RUTAS
+              RUTAS →
             </span>
           </div>
 
-          <div className="rr-card-metrics">
-
-            {/* labels */}
-            <div className="rr-m-label">DIST.</div>
-            <div className="rr-m-label">DESNIVEL</div>
-            <div className="rr-m-label">TIEMPO</div>
-            <div className="rr-m-label">PUNTOS</div>
-
-            {/* valores */}
-            <div className="rr-m-val">{metrics.distanceKm.toFixed(2)} km</div>
-            <div className="rr-m-val">{metrics.gainM} m</div>
-            <div className="rr-m-val">—</div>
-            <div className="rr-m-val">{points.length}</div>
-
-
-          </div>
-
-
-
           {error && (
-            <div className="rr-error">⚠️ GPS: {error}</div>
+            <div className="rr-error" style={{ marginTop: 8 }}>⚠️ GPS: {error}</div>
           )}
 
           <div style={{ display: "none" }}>

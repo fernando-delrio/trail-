@@ -36,10 +36,13 @@ export const Layout = () => {
   const hideHeader =
     location.pathname === "/login" ||
     location.pathname === "/signup" ||
-    location.pathname === "/about";
+    location.pathname === "/about" ||
+    location.pathname === "/explore" ||
+    location.pathname === "/route-registration";
 
   const hideFooter =
     location.pathname === "/route-registration" ||
+    location.pathname === "/explore" ||
     location.pathname === "/about";
 
   return (

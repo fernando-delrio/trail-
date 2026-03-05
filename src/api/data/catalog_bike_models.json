@@ -41,7 +41,7 @@
   {
     "id": "road-giant-defy",
     "brand": "Giant",
-    "model": "Defy",
+    "model": "Defy Advanced",
     "type": "Carretera",
     "price_eur": 1899,
     "wheel_size": "700c",
@@ -49,7 +49,7 @@
     "tags": ["road", "endurance", "larga-distancia", "confort"],
     "level": "intermediate",
     "description": "Endurance enfocada a confort en largas distancias.",
-    "product_url": "https://www.giant-bicycles.com"
+    "product_url": "https://www.giant-bicycles.com/es/defy-advanced"
   },
   {
     "id": "road-cannondale-synapse",
@@ -62,7 +62,46 @@
     "tags": ["road", "endurance", "larga-distancia"],
     "level": "intermediate",
     "description": "Carretera endurance orientada a fondo.",
-    "product_url": "https://www.cannondale.com"
+    "product_url": "https://www.cannondale.com/es-es/bikes/road/endurance/synapse"
+  },
+  {
+    "id": "road-orbea-orca",
+    "brand": "Orbea",
+    "model": "Orca",
+    "type": "Carretera",
+    "price_eur": 2799,
+    "wheel_size": "700c",
+    "travel_mm": { "front": 0, "rear": 0 },
+    "tags": ["road", "ligera", "competicion", "carbon"],
+    "level": "advanced",
+    "description": "Carretera de competición en carbono, muy ligera.",
+    "product_url": "https://www.orbea.com/es-es/bicicletas/carretera/orca"
+  },
+  {
+    "id": "road-giant-tcr",
+    "brand": "Giant",
+    "model": "TCR Advanced",
+    "type": "Carretera",
+    "price_eur": 2999,
+    "wheel_size": "700c",
+    "travel_mm": { "front": 0, "rear": 0 },
+    "tags": ["road", "competicion", "ligera", "carbon", "rapida"],
+    "level": "advanced",
+    "description": "Carretera de competición compacta y muy eficiente.",
+    "product_url": "https://www.giant-bicycles.com/es/tcr-advanced"
+  },
+  {
+    "id": "road-cannondale-supersix-evo",
+    "brand": "Cannondale",
+    "model": "SuperSix EVO",
+    "type": "Carretera",
+    "price_eur": 3499,
+    "wheel_size": "700c",
+    "travel_mm": { "front": 0, "rear": 0 },
+    "tags": ["road", "competicion", "ligera", "carbon"],
+    "level": "expert",
+    "description": "Carretera de competición pura, carbono premium.",
+    "product_url": "https://www.cannondale.com/es-es/bikes/road/race/supersix-evo"
   },
 
   {
@@ -115,7 +154,7 @@
     "tags": ["gravel", "polivalente", "pistas", "larga-distancia"],
     "level": "intermediate",
     "description": "Gravel polivalente para pistas y asfalto.",
-    "product_url": "https://www.specialized.com"
+    "product_url": "https://www.specialized.com/es/es/diverge"
   },
   {
     "id": "gravel-orbea-terra",
@@ -128,9 +167,61 @@
     "tags": ["gravel", "polivalente", "all-road"],
     "level": "intermediate",
     "description": "Gravel polivalente para pistas y carretera.",
-    "product_url": "https://www.orbea.com"
+    "product_url": "https://www.orbea.com/es-es/bicicletas/gravel/terra"
+  },
+  {
+    "id": "gravel-giant-revolt",
+    "brand": "Giant",
+    "model": "Revolt Advanced",
+    "type": "Gravel",
+    "price_eur": 2299,
+    "wheel_size": "700c",
+    "travel_mm": { "front": 0, "rear": 0 },
+    "tags": ["gravel", "aventura", "bikepacking", "carbon"],
+    "level": "intermediate",
+    "description": "Gravel en carbono lista para la aventura.",
+    "product_url": "https://www.giant-bicycles.com/es/revolt-advanced"
+  },
+  {
+    "id": "gravel-cannondale-topstone",
+    "brand": "Cannondale",
+    "model": "Topstone",
+    "type": "Gravel",
+    "price_eur": 1999,
+    "wheel_size": "700c",
+    "travel_mm": { "front": 0, "rear": 0 },
+    "tags": ["gravel", "bikepacking", "estable", "pistas"],
+    "level": "beginner",
+    "description": "Gravel versátil con excelente estabilidad en pista.",
+    "product_url": "https://www.cannondale.com/es-es/bikes/road/gravel/topstone"
+  },
+  {
+    "id": "gravel-scott-speedster",
+    "brand": "Scott",
+    "model": "Speedster Gravel",
+    "type": "Gravel",
+    "price_eur": 1699,
+    "wheel_size": "700c",
+    "travel_mm": { "front": 0, "rear": 0 },
+    "tags": ["gravel", "asfalto", "pistas", "polivalente"],
+    "level": "beginner",
+    "description": "Gravel de entrada rápida y cómoda para pistas y asfalto.",
+    "product_url": "https://www.scott-sports.com/es/es/bikes/road-bikes/gravel"
   },
 
+  {
+    "id": "xc-trek-marlin-7",
+    "brand": "Trek",
+    "model": "Marlin 7",
+    "type": "XC",
+    "price_eur": 1099,
+    "wheel_size": "29",
+    "travel_mm": { "front": 100, "rear": 0 },
+    "tags": ["xc", "hardtail", "iniciacion", "polivalente"],
+    "level": "beginner",
+    "description": "Hardtail de entrada perfecta para empezar en la montaña.",
+    "product_url": "https://www.trekbikes.com/es/es_ES/bikes/mountain-bikes/cross-country-mountain-bikes/marlin/"
+  },
   {
     "id": "xc-scott-scale-970",
     "brand": "Scott",
@@ -142,7 +233,7 @@
     "tags": ["xc", "hardtail", "subidas", "ligera"],
     "level": "beginner",
     "description": "XC rígida, sube bien y rueda rápido.",
-    "product_url": "https://www.scott-sports.com"
+    "product_url": "https://www.scott-sports.com/es/es/bikes/mountain-bikes/xc-bikes/scale"
   },
   {
     "id": "xc-specialized-chisel",
@@ -155,7 +246,7 @@
     "tags": ["xc", "hardtail", "ligera", "rapida"],
     "level": "intermediate",
     "description": "XC rígida moderna, rápida y eficiente.",
-    "product_url": "https://www.specialized.com"
+    "product_url": "https://www.specialized.com/es/es/chisel"
   },
   {
     "id": "xc-trek-procaliber",
@@ -168,7 +259,7 @@
     "tags": ["xc", "hardtail", "competicion"],
     "level": "intermediate",
     "description": "XC rígida orientada a competición.",
-    "product_url": "https://www.trekbikes.com"
+    "product_url": "https://www.trekbikes.com/es/es_ES/bikes/mountain-bikes/cross-country-mountain-bikes/procaliber/"
   },
   {
     "id": "xc-canyon-exceed",
@@ -181,7 +272,20 @@
     "tags": ["xc", "hardtail", "carbon", "competicion"],
     "level": "intermediate",
     "description": "XC rígida carbono para competir o ir muy rápido.",
-    "product_url": "https://www.canyon.com"
+    "product_url": "https://www.canyon.com/es-es/mountain-bikes/xc/exceed/"
+  },
+  {
+    "id": "xc-giant-xtc",
+    "brand": "Giant",
+    "model": "XTC Advanced",
+    "type": "XC",
+    "price_eur": 2599,
+    "wheel_size": "29",
+    "travel_mm": { "front": 100, "rear": 0 },
+    "tags": ["xc", "hardtail", "carbon", "ligera"],
+    "level": "intermediate",
+    "description": "XC rígida carbono ligera y muy eficiente en subidas.",
+    "product_url": "https://www.giant-bicycles.com/es/xtc-advanced"
   },
   {
     "id": "xc-orbea-oiz",
@@ -194,7 +298,20 @@
     "tags": ["xc", "doble", "competicion", "rapida"],
     "level": "advanced",
     "description": "XC doble moderna para maratón y circuitos.",
-    "product_url": "https://www.orbea.com"
+    "product_url": "https://www.orbea.com/es-es/bicicletas/montana/oiz"
+  },
+  {
+    "id": "xc-cannondale-scalpel",
+    "brand": "Cannondale",
+    "model": "Scalpel",
+    "type": "XC",
+    "price_eur": 3999,
+    "wheel_size": "29",
+    "travel_mm": { "front": 120, "rear": 120 },
+    "tags": ["xc", "doble", "competicion", "carbon"],
+    "level": "advanced",
+    "description": "XC doble carbono de competición con suspensión FlexPivot.",
+    "product_url": "https://www.cannondale.com/es-es/bikes/mountain/cross-country/scalpel"
   },
   {
     "id": "xc-specialized-epic",
@@ -207,9 +324,35 @@
     "tags": ["xc", "doble", "competicion", "premium"],
     "level": "expert",
     "description": "XC doble premium de competición.",
-    "product_url": "https://www.specialized.com"
+    "product_url": "https://www.specialized.com/es/es/epic"
+  },
+  {
+    "id": "xc-scott-spark-rc",
+    "brand": "Scott",
+    "model": "Spark RC",
+    "type": "XC",
+    "price_eur": 5299,
+    "wheel_size": "29",
+    "travel_mm": { "front": 120, "rear": 120 },
+    "tags": ["xc", "doble", "competicion", "premium", "carbon"],
+    "level": "expert",
+    "description": "XC doble de competición con carbono premium HMX-SL.",
+    "product_url": "https://www.scott-sports.com/es/es/bikes/mountain-bikes/xc-bikes/spark-rc"
   },
 
+  {
+    "id": "trail-canyon-neuron",
+    "brand": "Canyon",
+    "model": "Neuron",
+    "type": "Trail",
+    "price_eur": 2099,
+    "wheel_size": "29",
+    "travel_mm": { "front": 140, "rear": 130 },
+    "tags": ["trail", "polivalente", "rutas", "iniciacion"],
+    "level": "beginner",
+    "description": "Trail de iniciación polivalente para rutas técnicas y senderos.",
+    "product_url": "https://www.canyon.com/es-es/mountain-bikes/trail-bikes/neuron/"
+  },
   {
     "id": "trail-trek-fuel-ex",
     "brand": "Trek",
@@ -221,20 +364,46 @@
     "tags": ["trail", "polivalente", "bajadas", "rutas-largas"],
     "level": "intermediate",
     "description": "Trail polivalente para todo: sube y baja muy bien.",
-    "product_url": "https://www.trekbikes.com"
+    "product_url": "https://www.trekbikes.com/es/es_ES/bikes/mountain-bikes/trail-mountain-bikes/fuel-ex/"
   },
   {
-    "id": "trail-santacruz-hightower",
-    "brand": "Santa Cruz",
-    "model": "Hightower",
+    "id": "trail-specialized-stumpjumper",
+    "brand": "Specialized",
+    "model": "Stumpjumper",
     "type": "Trail",
-    "price_eur": 5799,
+    "price_eur": 3999,
     "wheel_size": "29",
-    "travel_mm": { "front": 160, "rear": 145 },
-    "tags": ["trail", "premium", "aggressive"],
+    "travel_mm": { "front": 150, "rear": 140 },
+    "tags": ["trail", "polivalente", "clasica", "bajadas"],
+    "level": "intermediate",
+    "description": "Icono del trail: equilibrada, divertida y muy capaz.",
+    "product_url": "https://www.specialized.com/es/es/stumpjumper"
+  },
+  {
+    "id": "trail-giant-trance",
+    "brand": "Giant",
+    "model": "Trance Advanced",
+    "type": "Trail",
+    "price_eur": 3299,
+    "wheel_size": "29",
+    "travel_mm": { "front": 150, "rear": 140 },
+    "tags": ["trail", "polivalente", "carbon", "bajadas"],
+    "level": "intermediate",
+    "description": "Trail en carbono muy capaz en subidas y bajadas.",
+    "product_url": "https://www.giant-bicycles.com/es/trance-advanced"
+  },
+  {
+    "id": "trail-orbea-occam",
+    "brand": "Orbea",
+    "model": "Occam",
+    "type": "Trail",
+    "price_eur": 3599,
+    "wheel_size": "29",
+    "travel_mm": { "front": 150, "rear": 140 },
+    "tags": ["trail", "polivalente", "aggressive", "bajadas"],
     "level": "advanced",
-    "description": "Trail agresiva premium para riders exigentes.",
-    "product_url": "https://www.santacruzbicycles.com"
+    "description": "Trail agresiva y versátil para senderos técnicos.",
+    "product_url": "https://www.orbea.com/es-es/bicicletas/montana/occam"
   },
   {
     "id": "trail-yt-jeffsy",
@@ -247,22 +416,22 @@
     "tags": ["trail", "aggressive", "polivalente"],
     "level": "intermediate",
     "description": "Trail agresiva con buen equilibrio precio/rendimiento.",
-    "product_url": "https://www.yt-industries.com"
+    "product_url": "https://www.yt-industries.com/en/mountain-bikes/jeffsy"
+  },
+  {
+    "id": "trail-santacruz-hightower",
+    "brand": "Santa Cruz",
+    "model": "Hightower",
+    "type": "Trail",
+    "price_eur": 5799,
+    "wheel_size": "29",
+    "travel_mm": { "front": 160, "rear": 145 },
+    "tags": ["trail", "premium", "aggressive"],
+    "level": "advanced",
+    "description": "Trail agresiva premium para riders exigentes.",
+    "product_url": "https://www.santacruzbicycles.com/es/hightower"
   },
 
-  {
-    "id": "enduro-commencal-meta-am-29",
-    "brand": "Commencal",
-    "model": "Meta AM 29",
-    "type": "Enduro",
-    "price_eur": 2999,
-    "wheel_size": "29",
-    "travel_mm": { "front": 170, "rear": 160 },
-    "tags": ["enduro", "aggressive", "bikepark", "aluminium"],
-    "level": "intermediate",
-    "description": "Enduro agresiva para bajadas técnicas y bikepark.",
-    "product_url": "https://www.commencal.com/es/es/bikes/enduro/meta-am/"
-  },
   {
     "id": "enduro-canyon-spectral",
     "brand": "Canyon",
@@ -277,17 +446,30 @@
     "product_url": "https://www.canyon.com/es-es/mountain-bikes/trail-bikes/spectral/"
   },
   {
-    "id": "enduro-specialized-enduro",
-    "brand": "Specialized",
-    "model": "Enduro",
+    "id": "enduro-commencal-meta-am-29",
+    "brand": "Commencal",
+    "model": "Meta AM 29",
     "type": "Enduro",
-    "price_eur": 5999,
+    "price_eur": 2999,
     "wheel_size": "29",
-    "travel_mm": { "front": 170, "rear": 170 },
-    "tags": ["enduro", "premium", "competicion", "aggressive"],
-    "level": "expert",
-    "description": "Enduro premium para competir y bajar muy fuerte.",
-    "product_url": "https://www.specialized.com"
+    "travel_mm": { "front": 170, "rear": 160 },
+    "tags": ["enduro", "aggressive", "bikepark", "aluminium"],
+    "level": "intermediate",
+    "description": "Enduro agresiva para bajadas técnicas y bikepark.",
+    "product_url": "https://www.commencal.com/es/es/bikes/enduro/meta-am/"
+  },
+  {
+    "id": "enduro-yt-capra",
+    "brand": "YT",
+    "model": "Capra",
+    "type": "Enduro",
+    "price_eur": 3499,
+    "wheel_size": "29",
+    "travel_mm": { "front": 170, "rear": 160 },
+    "tags": ["enduro", "aggressive", "bikepark", "polivalente"],
+    "level": "advanced",
+    "description": "Enduro bestial, imbatible precio-rendimiento en bajadas.",
+    "product_url": "https://www.yt-industries.com/en/mountain-bikes/capra"
   },
   {
     "id": "enduro-orbea-rallon",
@@ -300,9 +482,48 @@
     "tags": ["enduro", "aggressive", "competicion"],
     "level": "advanced",
     "description": "Enduro enfocada a bajadas y competición.",
-    "product_url": "https://www.orbea.com"
+    "product_url": "https://www.orbea.com/es-es/bicicletas/montana/rallon"
+  },
+  {
+    "id": "enduro-santacruz-megatower",
+    "brand": "Santa Cruz",
+    "model": "Megatower",
+    "type": "Enduro",
+    "price_eur": 6499,
+    "wheel_size": "29",
+    "travel_mm": { "front": 170, "rear": 160 },
+    "tags": ["enduro", "premium", "aggressive", "competicion"],
+    "level": "expert",
+    "description": "Enduro premium para competición y bajadas extremas.",
+    "product_url": "https://www.santacruzbicycles.com/es/megatower"
+  },
+  {
+    "id": "enduro-specialized-enduro",
+    "brand": "Specialized",
+    "model": "Enduro",
+    "type": "Enduro",
+    "price_eur": 5999,
+    "wheel_size": "29",
+    "travel_mm": { "front": 170, "rear": 170 },
+    "tags": ["enduro", "premium", "competicion", "aggressive"],
+    "level": "expert",
+    "description": "Enduro premium para competir y bajar muy fuerte.",
+    "product_url": "https://www.specialized.com/es/es/enduro"
   },
 
+  {
+    "id": "dh-canyon-sender",
+    "brand": "Canyon",
+    "model": "Sender",
+    "type": "DH",
+    "price_eur": 3299,
+    "wheel_size": "29/27.5",
+    "travel_mm": { "front": 200, "rear": 200 },
+    "tags": ["dh", "bikepark", "competicion"],
+    "level": "expert",
+    "description": "DH potente y accesible para bikepark y competición.",
+    "product_url": "https://www.canyon.com/es-es/mountain-bikes/downhill-bikes/sender/"
+  },
   {
     "id": "dh-commencal-supreme-dh",
     "brand": "Commencal",
@@ -317,6 +538,32 @@
     "product_url": "https://www.commencal.com/es/es/bikes/downhill/supreme-dh/"
   },
   {
+    "id": "dh-trek-session",
+    "brand": "Trek",
+    "model": "Session",
+    "type": "DH",
+    "price_eur": 5499,
+    "wheel_size": "27.5",
+    "travel_mm": { "front": 200, "rear": 200 },
+    "tags": ["dh", "bikepark", "competicion", "premium"],
+    "level": "expert",
+    "description": "DH de competición probada en la Copa del Mundo.",
+    "product_url": "https://www.trekbikes.com/es/es_ES/bikes/mountain-bikes/downhill-bikes/session/"
+  },
+  {
+    "id": "dh-yt-tues",
+    "brand": "YT",
+    "model": "Tues",
+    "type": "DH",
+    "price_eur": 4299,
+    "wheel_size": "29/27.5",
+    "travel_mm": { "front": 200, "rear": 210 },
+    "tags": ["dh", "bikepark", "competicion", "aggressive"],
+    "level": "expert",
+    "description": "DH agresiva y estable, con herencia de Copa del Mundo.",
+    "product_url": "https://www.yt-industries.com/en/mountain-bikes/tues"
+  },
+  {
     "id": "dh-santacruz-v10",
     "brand": "Santa Cruz",
     "model": "V10",
@@ -327,6 +574,6 @@
     "tags": ["dh", "premium", "competicion", "bikepark"],
     "level": "expert",
     "description": "DH premium de competición.",
-    "product_url": "https://www.santacruzbicycles.com"
+    "product_url": "https://www.santacruzbicycles.com/es/v10"
   }
 ]

@@ -6,9 +6,12 @@ export default function RouteRegistrationHeader({
   onFilterChange,
 }) {
   const filters = [
-    { id: "gravel", label: "GRAVEL" },
-    { id: "mtb", label: "ENDURO" },
-    { id: "stops", label: "CC" },
+    { id: "gravel",    label: "GRAVEL" },
+    { id: "xc",        label: "XC" },
+    { id: "trail",     label: "TRAIL" },
+    { id: "enduro",    label: "ENDURO" },
+    { id: "downhill",  label: "DOWNHILL" },
+    { id: "carretera", label: "CARRETERA" },
   ];
 
   return (
