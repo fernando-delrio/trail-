@@ -407,3 +407,17 @@
   background: rgba(148, 163, 184, 0.4);
   border-radius: 3px;
 }
+
+@media (max-width: 480px) {
+  .part-row {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 8px;
+  }
+  .part-number { grid-column: 1 / -1; text-align: left; }
+  .part-input:first-of-type { grid-column: 1 / -1; }
+  .km-input { grid-column: 1; }
+  .btn-remove-part { grid-column: 2; justify-self: end; }
+  .bike-form-scroll { padding: 16px; padding-bottom: 160px; }
+  .modal-header h2 { font-size: 1.2rem; }
+}

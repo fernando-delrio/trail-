@@ -96,3 +96,13 @@
     font-size: 0.65rem;
   }
 }
+
+@media (max-width: 480px) {
+  .stats {
+    flex-direction: column;
+  }
+  .stat-card {
+    padding: var(--space-sm) var(--space-md);
+    border-radius: 14px;
+  }
+}
