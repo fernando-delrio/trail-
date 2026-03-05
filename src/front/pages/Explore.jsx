@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 
 import MapView from "../components/Map/MapView";
 import RouteRegistrationHeader from "../components/RouteRegistration/RouteRegistrationHeader";
-import RouteRegistrationBottomNav from "../components/RouteRegistration/RouteRegistrationBottomNav";
 import NearbyServicesDropdown from "../components/Map/NearbyServicesDropdown";
+import AiChatDialog from "../components/AiChatDialog";
 
 import useRoutePlanner from "../hooks/useRoutePlanner";
 import { saveRoute } from "../services/routesStorage";
@@ -31,6 +31,7 @@ export default function Explore() {
   const [activeFilter, setActiveFilter] = useState("gravel");
   const [routeName] = useState("RUTA");
 
+  const [analyzeRoute, setAnalyzeRoute] = useState(null);
   const [servicesOpen, setServicesOpen] = useState(false);
   const [services, setServices] = useState(null);
   const [servicesError, setServicesError] = useState(null);
@@ -254,7 +255,8 @@ export default function Explore() {
         <div className="rr-card">
           <div className="rr-card-title">{routeName}</div>
           <div className="rr-card-subtitle">
-            Terreno: {activeFilter.toUpperCase()} · Listo
+            Terreno: {activeFilter.toUpperCase()} ·{" "}
+            {hasStarted && !canSave ? "Haz clic en el mapa para añadir puntos" : canSave ? "Ruta lista" : "Listo"}
           </div>
 
           <div className="rr-card-metrics">
@@ -269,6 +271,13 @@ export default function Explore() {
                 }}
               >
                 INICIAR
+              </button>
+
+              <button
+                className="ui-btn ui-btn--secondary"
+                onClick={() => navigate("/route-registration")}
+              >
+                ▶ GRABAR
               </button>
 
               <button
@@ -298,6 +307,23 @@ export default function Explore() {
                 disabled={!canSave || hasSaved}
               >
                 GUARDAR
+              </button>
+
+              <button
+                className="ui-btn ui-btn--primary"
+                disabled={!canSave}
+                onClick={() =>
+                  setAnalyzeRoute({
+                    name: routeName,
+                    type: "planned",
+                    terrain: activeFilter,
+                    distance_km: summary?.distanceKm ?? 0,
+                    duration_min: summary?.durationMin ?? null,
+                    gain_m: null,
+                  })
+                }
+              >
+                ANALIZAR
               </button>
             </div>
 
@@ -335,12 +361,7 @@ export default function Explore() {
         }}
       />
 
-      <RouteRegistrationBottomNav
-        isRecording={false}
-        fabTo="/route-registration"
-        fabLabel="Ir a grabar ruta"
-        fabTitle="Grabar ruta"
-      />
+      <AiChatDialog routeContext={analyzeRoute} />
     </div>
   );
 }

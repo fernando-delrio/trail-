@@ -29,4 +29,19 @@ export default function RouteRegistrationBottomNav({
     if (fabTo) return navigate(fabTo);
     if (typeof onStart === "function") return onStart();
   };
+
+  return (
+    <div className="rr-bottom">
+      <div className="rr-bottom-nav rr-bottom-nav--single">
+        <button
+          type="button"
+          className={`rr-fab ${isRecording ? "rr-fab--stop" : ""}`}
+          title={computed.title}
+          onClick={handleFabClick}
+        >
+          {computed.icon}
+        </button>
+      </div>
+    </div>
+  );
 }

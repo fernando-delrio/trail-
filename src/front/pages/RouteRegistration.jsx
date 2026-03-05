@@ -106,15 +106,24 @@ export default function RouteRegistration() {
           </div>
 
 
-          {/* fila nueva ruta*/}
-          <div className="rr-new-route">
+          <div className="rr-actions">
+            <button
+              className={`ui-btn ${isRecording ? "ui-btn--danger" : "ui-btn--primary"}`}
+              onClick={toggle}
+            >
+              {isRecording ? "■ DETENER" : "▶ INICIAR"}
+            </button>
+
             <button
               className="ui-btn ui-btn--secondary"
               onClick={() => navigate("/explore")}
             >
-              Nueva Ruta
+              Planificar
             </button>
 
+            <span className="rr-link" onClick={() => navigate("/saved-routes")}>
+              RUTAS
+            </span>
           </div>
 
           <div className="rr-card-metrics">
@@ -123,30 +132,29 @@ export default function RouteRegistration() {
             <div className="rr-m-label">DIST.</div>
             <div className="rr-m-label">DESNIVEL</div>
             <div className="rr-m-label">TIEMPO</div>
-            <div className="rr-m-label">RUTAS</div>
+            <div className="rr-m-label">PUNTOS</div>
 
             {/* valores */}
             <div className="rr-m-val">{metrics.distanceKm.toFixed(2)} km</div>
             <div className="rr-m-val">{metrics.gainM} m</div>
             <div className="rr-m-val">—</div>
-
-            <span
-              className="rr-link"
-              onClick={() => navigate("/saved-routes")}
-            >
-              RUTAS
-            </span>
+            <div className="rr-m-val">{points.length}</div>
 
 
           </div>
 
 
+
+          {error && (
+            <div className="rr-error">⚠️ GPS: {error}</div>
+          )}
 
           <div style={{ display: "none" }}>
             {JSON.stringify({ points: points.length, geojsonLine })}
           </div>
         </div>
       </div>
+
     </div>
   );
 }
