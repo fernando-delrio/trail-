@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { deleteRoute, getRoutes } from "../services/routesStorage";
+import AiChatDialog from "../components/AiChatDialog";
 
 export default function SavedRoutes() {
   const navigate = useNavigate();
@@ -9,6 +10,7 @@ export default function SavedRoutes() {
   const [routes, setRoutes] = useState([]);
   const [filter, setFilter] = useState("all");
   const [error, setError] = useState(null);
+  const [analyzeRoute, setAnalyzeRoute] = useState(null);
 
   useEffect(() => {
     const cancelled = { current: false };
@@ -130,6 +132,14 @@ export default function SavedRoutes() {
 
                   <button
                     type="button"
+                    onClick={() => setAnalyzeRoute({ ...r })}
+                    className="ui-btn ui-btn--primary"
+                  >
+                    Analizar
+                  </button>
+
+                  <button
+                    type="button"
                     onClick={() => handleDelete(r.id)}
                     className="ui-btn ui-btn--danger"
                   >
@@ -143,6 +153,8 @@ export default function SavedRoutes() {
         )}
 
       </main>
+
+      <AiChatDialog routeContext={analyzeRoute} />
     </div>
   );
 }

@@ -171,6 +171,16 @@
   color: #111;
 }
 
+.rr-bottom-nav--single {
+  display: flex;
+  justify-content: center;
+}
+
+.rr-fab--stop {
+  background: #e53e3e;
+  color: #fff;
+}
+
 .rr-nav-item {
   border: 0;
   background: transparent;

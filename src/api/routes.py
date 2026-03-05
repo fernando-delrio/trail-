@@ -512,6 +512,7 @@ def ai_chat():
         messages = body.get("messages") or []
         context = body.get("context") or {}
         user_profile = body.get("user_profile") or {}
+        route_context = body.get("route_context") or {}
 
         if not isinstance(messages, list) or len(messages) == 0:
             return jsonify({"error": "messages debe ser una lista no vacía"}), 400
@@ -539,6 +540,8 @@ def ai_chat():
                 "- Si pide comparar modelos, usa solo los que están en RECOMMENDATIONS. Muestra pros/contras concretos.\n"
                 "- Si pregunta por mantenimiento o estado de componentes: analiza el DESGASTE del PERFIL. "
                 "Avisa de piezas >= 80% (urgente) o >= 60% (vigilar pronto). Sé específico: pieza, porcentaje, acción.\n"
+                "- Si hay una RUTA ANALIZADA: evalúa qué bici del PERFIL DEL USUARIO es más adecuada según terreno, distancia y desnivel. "
+                "Sé directo: nombra la bici, explica por qué encaja y advierte si alguna pieza está muy desgastada para esa ruta.\n"
                 "- Al final añade 1 o 2 preguntas de seguimiento en este formato EXACTO (sin emojis en opciones):\n"
                 "[Q1] ¿pregunta? | Opción A | Opción B | Opción C\n"
                 "[Q2] ¿pregunta? | Opción A | Opción B\n"
@@ -598,7 +601,22 @@ def ai_chat():
             and m.get("content") not in _SKIP
         ]
 
-        prompt = [system, catalog_context, profile_context] + clean_history
+        if route_context.get("name") or route_context.get("terrain"):
+            route_sys = {
+                "role": "system",
+                "content": (
+                    "RUTA ANALIZADA:\n"
+                    f"- Nombre: {route_context.get('name', '—')}\n"
+                    f"- Tipo: {route_context.get('type', '—')}\n"
+                    f"- Terreno: {route_context.get('terrain', '—')}\n"
+                    f"- Distancia: {float(route_context.get('distance_km') or 0):.2f} km\n"
+                    f"- Desnivel: +{round(float(route_context.get('gain_m') or 0))} m\n"
+                    "Evalúa qué bici del PERFIL DEL USUARIO es más adecuada para esta ruta."
+                ),
+            }
+            prompt = [system, catalog_context, profile_context, route_sys] + clean_history
+        else:
+            prompt = [system, catalog_context, profile_context] + clean_history
 
         # 3) Llamar a Mistral
         result = mistral_chat(prompt, temperature=0.4)

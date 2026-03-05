@@ -196,7 +196,7 @@ function updateContextFromUserText(prev, text) {
   return next;
 }
 
-export default function AiChatDialog({ floating = true }) {
+export default function AiChatDialog({ floating = true, routeContext = null }) {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -219,6 +219,20 @@ export default function AiChatDialog({ floating = true }) {
   const [context, setContext] = useState(DEFAULT_CONTEXT);
 
   const listRef = useRef(null);
+  const routeAnalysisSentRef = useRef(null);
+  const pendingRouteMsg = useRef(null);
+
+  // Cuando llega un routeContext nuevo, prepara el mensaje y abre el chat
+  useEffect(() => {
+    if (!routeContext) return;
+    const { name, terrain, distance_km, gain_m, type } = routeContext;
+    pendingRouteMsg.current = `Analiza esta ruta: "${name || "Sin nombre"}", tipo ${type || "—"}, terreno ${terrain || "—"}, ${Number(distance_km || 0).toFixed(2)} km, desnivel +${Math.round(gain_m || 0)} m. ¿Qué bici de mi garaje es la más adecuada para ella?`;
+    routeAnalysisSentRef.current = null;
+    setMessages(DEFAULT_MESSAGES);
+    setContext(DEFAULT_CONTEXT);
+    setInput("");
+    setOpen(true);
+  }, [routeContext]);
 
   // Auto-scroll
   useEffect(() => {
@@ -255,6 +269,7 @@ export default function AiChatDialog({ floating = true }) {
           messages: nextMessages,
           context: updatedContext,
           user_profile: buildUserProfile(),
+          route_context: routeContext || undefined,
         }),
       });
 
@@ -321,7 +336,7 @@ export default function AiChatDialog({ floating = true }) {
       const resp = await fetch(`${backendUrl}/api/ai/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: nextMessages, context: updatedContext, user_profile: buildUserProfile() }),
+        body: JSON.stringify({ messages: nextMessages, context: updatedContext, user_profile: buildUserProfile(), route_context: routeContext || undefined }),
       });
       const data = await resp.json().catch(() => ({}));
       if (!resp.ok) {
@@ -358,6 +373,19 @@ export default function AiChatDialog({ floating = true }) {
       })),
     })),
   });
+
+  // Dispara el auto-análisis de ruta tras abrir el chat y resetear mensajes
+  useEffect(() => {
+    if (!open || !pendingRouteMsg.current || sending) return;
+    if (messages.length !== DEFAULT_MESSAGES.length) return;
+    if (routeAnalysisSentRef.current) return;
+    routeAnalysisSentRef.current = true;
+    const msg = pendingRouteMsg.current;
+    pendingRouteMsg.current = null;
+    sendQuestion(msg);
+  // sendQuestion es estable en este contexto; ignoramos exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, sending, messages.length]);
 
   const onKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
