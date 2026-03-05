@@ -1,10 +1,7 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useUser } from "../context/UserContext";
+import { session } from "../services/session";
 
-// ==============================
-// LocalStorage keys
-// ==============================
-const LS_MESSAGES_KEY = "gastacobre_messages_v1";
-const LS_CONTEXT_KEY = "gastacobre_context_v1";
 
 
 const DEFAULT_BACKEND = "http://127.0.0.1:3001";
@@ -29,15 +26,6 @@ const DEFAULT_CONTEXT = {
   excluded_brands: [],
   tags: [],
 };
-
-function safeJsonParse(value, fallback) {
-  try {
-    if (!value) return fallback;
-    return JSON.parse(value);
-  } catch {
-    return fallback;
-  }
-}
 
 function normalize(str) {
   return (str || "").toLowerCase().trim();
@@ -212,39 +200,25 @@ export default function AiChatDialog({ floating = true }) {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
+  const [userBikes, setUserBikes] = useState([]);
 
-  // Backend URL (localStorage -> env -> default)
-  const backendUrl = useMemo(() => {
-    const stored = localStorage.getItem("backendUrl");
-    const env = import.meta?.env?.VITE_BACKEND_URL;
-    return (stored || env || DEFAULT_BACKEND).replace(/\/$/, "");
-  }, []);
+  const { user } = useUser();
 
-  // Persistencia: mensajes
-  const [messages, setMessages] = useState(() => {
-    const saved = safeJsonParse(localStorage.getItem(LS_MESSAGES_KEY), null);
-    return Array.isArray(saved) && saved.length ? saved : DEFAULT_MESSAGES;
-  });
+  const backendUrl = (import.meta?.env?.VITE_BACKEND_URL || DEFAULT_BACKEND).replace(/\/$/, "");
 
-  // Persistencia: contexto
-  const [context, setContext] = useState(() => {
-    const saved = safeJsonParse(localStorage.getItem(LS_CONTEXT_KEY), null);
-    return saved && typeof saved === "object"
-      ? { ...DEFAULT_CONTEXT, ...saved }
-      : DEFAULT_CONTEXT;
-  });
+  useEffect(() => {
+    const token = session.getToken();
+    if (!token) return;
+    fetch(`${backendUrl}/api/bikes`, { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => { if (Array.isArray(data)) setUserBikes(data); })
+      .catch(() => {});
+  }, [backendUrl]);
+
+  const [messages, setMessages] = useState(DEFAULT_MESSAGES);
+  const [context, setContext] = useState(DEFAULT_CONTEXT);
 
   const listRef = useRef(null);
-
-  // Guardar mensajes
-  useEffect(() => {
-    localStorage.setItem(LS_MESSAGES_KEY, JSON.stringify(messages));
-  }, [messages]);
-
-  // Guardar contexto
-  useEffect(() => {
-    localStorage.setItem(LS_CONTEXT_KEY, JSON.stringify(context));
-  }, [context]);
 
   // Auto-scroll
   useEffect(() => {
@@ -259,8 +233,6 @@ export default function AiChatDialog({ floating = true }) {
     setMessages(DEFAULT_MESSAGES);
     setContext(DEFAULT_CONTEXT);
     setInput("");
-    localStorage.removeItem(LS_MESSAGES_KEY);
-    localStorage.removeItem(LS_CONTEXT_KEY);
   };
 
   const send = async () => {
@@ -282,6 +254,7 @@ export default function AiChatDialog({ floating = true }) {
         body: JSON.stringify({
           messages: nextMessages,
           context: updatedContext,
+          user_profile: buildUserProfile(),
         }),
       });
 
@@ -313,13 +286,16 @@ export default function AiChatDialog({ floating = true }) {
         setMessages((m) => [...m, { role: "assistant", content: "__RECS_BLOCK__", recs }]);
       }
 
-      // Preguntas
+      // Chips de sugerencia (presupuesto / terreno)
+      const chips = Array.isArray(data?.suggested_chips) ? data.suggested_chips : [];
+      if (chips.length) {
+        setMessages((m) => [...m, { role: "assistant", content: "__CHIPS__", chips }]);
+      }
+
+      // Preguntas de seguimiento
       const qs = Array.isArray(data?.next_questions) ? data.next_questions : [];
       if (qs.length) {
-        setMessages((m) => [
-          ...m,
-          { role: "assistant", content: `❓ Preguntas:\n- ${qs.join("\n- ")}` },
-        ]);
+        setMessages((m) => [...m, { role: "assistant", content: "__QUESTIONS__", questions: qs }]);
       }
     } catch (e) {
       setMessages((m) => [
@@ -333,6 +309,55 @@ export default function AiChatDialog({ floating = true }) {
       setSending(false);
     }
   };
+
+  const sendQuestion = async (text) => {
+    if (sending) return;
+    const updatedContext = updateContextFromUserText(context, text);
+    setContext(updatedContext);
+    const nextMessages = [...messages, { role: "user", content: text }];
+    setMessages(nextMessages);
+    setSending(true);
+    try {
+      const resp = await fetch(`${backendUrl}/api/ai/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: nextMessages, context: updatedContext, user_profile: buildUserProfile() }),
+      });
+      const data = await resp.json().catch(() => ({}));
+      if (!resp.ok) {
+        setMessages((m) => [...m, { role: "assistant", content: `⚠️ ${data?.error || "error"}` }]);
+        return;
+      }
+      setMessages((m) => [...m, { role: "assistant", content: (data?.assistant_message || "").trim() || "OK" }]);
+      const recs = Array.isArray(data?.recommendations) ? data.recommendations : [];
+      if (recs.length) setMessages((m) => [...m, { role: "assistant", content: "__RECS_BLOCK__", recs }]);
+      const chips = Array.isArray(data?.suggested_chips) ? data.suggested_chips : [];
+      if (chips.length) setMessages((m) => [...m, { role: "assistant", content: "__CHIPS__", chips }]);
+      const qs = Array.isArray(data?.next_questions) ? data.next_questions : [];
+      if (qs.length) setMessages((m) => [...m, { role: "assistant", content: "__QUESTIONS__", questions: qs }]);
+    } catch (e) {
+      setMessages((m) => [...m, { role: "assistant", content: `⚠️ ${e?.message || "Failed to fetch"}` }]);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const buildUserProfile = () => ({
+    name: user?.name || null,
+    location: user?.location || null,
+    bikes: userBikes.map((b) => ({
+      name: b.name,
+      model: b.model,
+      km: b.km_total,
+      parts: (b.parts || []).map((p) => ({
+        name: p.part_name,
+        brand: p.brand,
+        wear: p.wear_percentage,
+        km_current: p.km_current,
+        km_life: p.km_life,
+      })),
+    })),
+  });
 
   const onKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -383,6 +408,11 @@ export default function AiChatDialog({ floating = true }) {
               {messages.map((m, idx) => {
                 const isUser = m.role === "user";
 
+                // ignorar bloques huérfanos
+                if (m.content === "__RECS_BLOCK__" && !Array.isArray(m.recs)) return null;
+                if (m.content === "__QUESTIONS__" && !Array.isArray(m.questions)) return null;
+                if (m.content === "__CHIPS__" && !Array.isArray(m.chips)) return null;
+
                 // bloque recomendaciones
                 if (m.content === "__RECS_BLOCK__" && Array.isArray(m.recs)) {
                   return (
@@ -428,6 +458,57 @@ export default function AiChatDialog({ floating = true }) {
                   );
                 }
 
+                // chips de sugerencia (presupuesto / terreno)
+                if (m.content === "__CHIPS__" && Array.isArray(m.chips)) {
+                  return (
+                    <div key={`chips-${idx}`} className="gc-chips">
+                      {m.chips.map((c, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          className="gc-chip-btn"
+                          onClick={() => sendQuestion(c.value)}
+                          disabled={sending}
+                        >
+                          {c.label}
+                        </button>
+                      ))}
+                    </div>
+                  );
+                }
+
+                // bloque preguntas de seguimiento
+                if (m.content === "__QUESTIONS__" && Array.isArray(m.questions)) {
+                  return (
+                    <div key={`qs-${idx}`} className="gc-questions-block">
+                      {m.questions.map((q, i) => {
+                        const questionText = typeof q === "object" ? q.question : q;
+                        const options = typeof q === "object" && Array.isArray(q.options) ? q.options : [];
+                        return (
+                          <div key={i} className="gc-question-item">
+                            <div className="gc-question-text">{questionText}</div>
+                            {options.length > 0 && (
+                              <div className="gc-chips">
+                                {options.map((opt, j) => (
+                                  <button
+                                    key={j}
+                                    type="button"
+                                    className="gc-chip-btn"
+                                    onClick={() => sendQuestion(opt)}
+                                    disabled={sending}
+                                  >
+                                    {opt}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                }
+
                 // mensaje normal
                 return (
                   <div
@@ -458,13 +539,6 @@ export default function AiChatDialog({ floating = true }) {
               </button>
             </div>
 
-            <div className="gc-footer">
-              <small>Backend: {backendUrl}</small>
-              <small className="gc-footer-right">
-                Memoria: {context?.mode ? `modo ${context.mode}` : "sin modo"}
-                {context?.budget ? ` · ${context.budget}€` : ""}
-              </small>
-            </div>
           </div>
         </div>
       )}

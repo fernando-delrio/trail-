@@ -153,3 +153,24 @@
   padding-top: 120px;
 }
 
+@media (max-width: 768px) {
+  .profile-avatar { width: 64px; height: 64px; }
+  .user-avatar img { width: 56px; height: 56px; }
+  .app-root { padding-top: 90px; }
+  .nav-home-icon { font-size: 1.6rem; }
+  .settings-btn .logout-icon { font-size: 1.6rem; }
+  .home-hello { font-size: 1.6rem; }
+  .header-inner { padding: var(--space-xs) var(--space-sm); }
+  .header-left { gap: 1.5rem; }
+}
+
+@media (max-width: 480px) {
+  .profile-avatar { width: 48px; height: 48px; }
+  .user-avatar img { width: 44px; height: 44px; }
+  .app-root { padding-top: 76px; }
+  .nav-home-icon { font-size: 1.4rem; }
+  .settings-btn .logout-icon { font-size: 1.4rem; }
+  .home-hello { font-size: 1.3rem; }
+  .edit-profile-btn { font-size: 10px; padding: 3px 8px; }
+  .header-left { gap: 0.75rem; }
+}

@@ -6,7 +6,7 @@ from api.models import db, User, Bike, BikePart, BikeModel, SavedRoute
 from api.utils import generate_sitemap, APIException, is_valid_email
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from api.services.ollama_client import ollama_chat
+from api.services.mistral_client import mistral_chat
 from api.services.catalog import load_catalog, rank_bikes
 from api.services.overpass_pois import get_nearby_services_for_route
 from datetime import datetime, timezone
@@ -483,65 +483,144 @@ def update_bike(bike_id):
     return jsonify(bike.serialize()), 200
 
 
+import re as _re
+
+_BUY_RX = _re.compile(
+    r"\b(bici|bicicleta|busco|quiero|comprar|recomienda|presupuesto|precio|trail|xc|enduro|dh|downhill|gravel|carretera|modalidad|terreno|montar|rueda|suspensión|horquilla|cuadro|componentes)\b",
+    _re.IGNORECASE,
+)
+_MAINT_RX = _re.compile(
+    r"\b(mantenimiento|desgaste|revisar|revisión|cambiar|pieza|piezas|estado|cadena|frenos|pastillas|llantas|rodamiento)\b",
+    _re.IGNORECASE,
+)
+
+def _is_bike_intent(messages):
+    """Devuelve True si el último mensaje del usuario habla de compra o mantenimiento de bicis."""
+    for m in reversed(messages):
+        if m.get("role") == "user":
+            text = m.get("content") or ""
+            return bool(_BUY_RX.search(text) or _MAINT_RX.search(text))
+    return False
+
+
 @api.route("/ai/chat", methods=["POST"])
-# @jwt_required()  
+# @jwt_required()
 def ai_chat():
     try:
+        import re
         body = request.get_json(silent=True) or {}
         messages = body.get("messages") or []
         context = body.get("context") or {}
+        user_profile = body.get("user_profile") or {}
 
         if not isinstance(messages, list) or len(messages) == 0:
             return jsonify({"error": "messages debe ser una lista no vacía"}), 400
         if not isinstance(context, dict):
             context = {}
 
-        # 1) Rankear bicis del catálogo
+        # 1) Rankear bicis solo cuando el usuario pregunta algo relacionado con bicis
+        bike_intent = _is_bike_intent(messages)
         catalog = load_catalog()
-        recommendations = rank_bikes(context, catalog, limit=3)
+        recommendations = rank_bikes(context, catalog, limit=3) if bike_intent else []
 
-        # 2) Construir prompt para Ollama
+        # 2) Construir prompt para Mistral
         system = {
             "role": "system",
             "content": (
-                "Eres GASTACOBRE, asistente de compra de bicis.\n"
+                "Eres GASTACOBRE, asistente experto en ciclismo de montaña y compra de bicis.\n"
                 "Reglas:\n"
-                "- Responde SIEMPRE en español.\n"
-                "- Sé breve, claro y práctico.\n"
-                "- NO inventes modelos. SOLO puedes hablar de las recomendaciones del catálogo que te pasan.\n"
-                "- Si falta modalidad o presupuesto, pregunta 1-2 cosas.\n"
-                "- Cuando haya recomendaciones, explica por qué encajan y sugiere 1-2 preguntas siguientes.\n"
+                "- Responde SIEMPRE en español, de forma natural y cercana.\n"
+                "- Sé breve, claro y práctico. Sin relleno.\n"
+                "- Si el usuario saluda o pregunta algo no relacionado con bicis, responde brevemente y pregunta en qué puedes ayudarle.\n"
+                "- NO inventes modelos. SOLO puedes hablar de las RECOMMENDATIONS del catálogo.\n"
+                "- Si faltan datos (modalidad o presupuesto), pregunta 1 cosa concreta.\n"
+                "- Cuando hay recomendaciones, explica en 1 frase por qué encaja cada una.\n"
+                "- Si el usuario pregunta por su garaje o sus bicis, responde SOLO con los datos del PERFIL DEL USUARIO.\n"
+                "- Si pide comparar modelos, usa solo los que están en RECOMMENDATIONS. Muestra pros/contras concretos.\n"
+                "- Si pregunta por mantenimiento o estado de componentes: analiza el DESGASTE del PERFIL. "
+                "Avisa de piezas >= 80% (urgente) o >= 60% (vigilar pronto). Sé específico: pieza, porcentaje, acción.\n"
+                "- Al final añade 1 o 2 preguntas de seguimiento en este formato EXACTO (sin emojis en opciones):\n"
+                "[Q1] ¿pregunta? | Opción A | Opción B | Opción C\n"
+                "[Q2] ¿pregunta? | Opción A | Opción B\n"
+                "Las opciones son respuestas de 1-4 palabras que el usuario puede pulsar.\n"
+                "Ejemplos terreno: Trail | XC | Enduro | DH | Carretera | Gravel\n"
+                "Ejemplos presupuesto: 1000-2000€ | 2000-3500€ | 3500-5000€ | +5000€\n"
+                "Ejemplos suspension: Doble suspension | Rigida\n"
+                "IMPORTANTE: usa siempre | entre pregunta y opciones.\n"
             ),
         }
 
-        
-        catalog_context = {
-            "role": "system",
-            "content": (
-                "RECOMMENDATIONS (del catálogo, no inventar):\n"
-                + "\n".join(
-                    [
+        if recommendations:
+            catalog_context = {
+                "role": "system",
+                "content": (
+                    "RECOMMENDATIONS (del catálogo, no inventar):\n"
+                    + "\n".join(
                         f"- {r['name']} | type={r.get('type')} | price={r.get('price_eur')}€ | url={r.get('url')}"
                         for r in recommendations
-                    ]
-                )
-            ),
+                    )
+                ),
+            }
+        else:
+            catalog_context = {
+                "role": "system",
+                "content": "RECOMMENDATIONS: ninguna (el usuario no está buscando bici ahora mismo).",
+            }
+
+        profile_lines = []
+        if user_profile.get("name"):
+            profile_lines.append(f"- Nombre: {user_profile['name']}")
+        if user_profile.get("location"):
+            profile_lines.append(f"- Ubicación: {user_profile['location']}")
+        bikes = user_profile.get("bikes") or []
+        for b in bikes[:5]:
+            bike_label = f"{b.get('name')} ({b.get('model') or 'sin modelo'}, {b.get('km') or 0} km)"
+            profile_lines.append(f"- Bici: {bike_label}")
+            for p in (b.get("parts") or []):
+                wear = p.get("wear") or 0
+                km_c = p.get("km_current") or 0
+                km_l = p.get("km_life") or 0
+                brand_model = " ".join(filter(None, [p.get("brand"), p.get("name")]))
+                profile_lines.append(f"  · {brand_model}: desgaste {wear}% ({km_c}/{km_l} km)")
+
+        profile_context = {
+            "role": "system",
+            "content": "PERFIL DEL USUARIO:\n" + "\n".join(profile_lines) if profile_lines else "PERFIL DEL USUARIO: desconocido",
         }
 
-        prompt = [system, catalog_context] + [
+        # Filtrar del historial los mensajes especiales antes de enviar a Mistral
+        _SKIP = {"__RECS_BLOCK__", "__QUESTIONS__", "__CHIPS__"}
+        clean_history = [
             {"role": m.get("role"), "content": m.get("content")}
             for m in messages
-            if m.get("role") in ("user", "assistant") and isinstance(m.get("content"), str)
+            if m.get("role") in ("user", "assistant")
+            and isinstance(m.get("content"), str)
+            and m.get("content") not in _SKIP
         ]
 
-        # 3) Llamar a Ollama
-        result = ollama_chat(prompt, temperature=0.3)
+        prompt = [system, catalog_context, profile_context] + clean_history
+
+        # 3) Llamar a Mistral
+        result = mistral_chat(prompt, temperature=0.4)
+
+        raw_text = result.get("assistant_message", "").strip()
+
+        raw_q_lines = re.findall(r"\[Q\d+\]\s*(.+)", raw_text)
+        clean_text = re.sub(r"\[Q\d+\]\s*.+", "", raw_text).strip()
+        clean_text = re.sub(r"__RECS_BLOCK__|__QUESTIONS__|__CHIPS__", "", clean_text).strip()
+
+        next_questions = []
+        for line in raw_q_lines:
+            parts = [p.strip() for p in line.split("|")]
+            question_text = parts[0]
+            options = [o for o in parts[1:] if o]
+            next_questions.append({"question": question_text, "options": options})
 
         return jsonify(
             {
-                "assistant_message": result.get("assistant_message", "").strip(),
-                "recommendations": recommendations,  
-                "next_questions": [],
+                "assistant_message": clean_text,
+                "recommendations": recommendations,
+                "next_questions": next_questions,
                 "context": context,
             }
         ), 200
