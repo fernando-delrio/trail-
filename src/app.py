@@ -22,7 +22,15 @@ static_file_dir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 
-CORS(app)
+_extra = os.getenv("FRONTEND_URL", "")
+_allowed_origins = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:3001",
+    "https://crazymountainbikesocial.onrender.com",
+] + ([_extra] if _extra else [])
+CORS(app, origins=_allowed_origins)
 
 # database condiguration
 db_url = os.getenv("DATABASE_URL")
